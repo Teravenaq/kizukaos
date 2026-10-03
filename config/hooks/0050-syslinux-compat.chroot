@@ -17,4 +17,8 @@ fi
 if [ -e /usr/lib/syslinux/modules/bios/vesamenu.c32 ]; then
     ln -sf /usr/lib/syslinux/modules/bios/vesamenu.c32 /usr/lib/syslinux/vesamenu.c32
 fi
+# Old live-build calls `rsvg` (removed upstream); librsvg2-bin ships `rsvg-convert`.
+if [ -e /usr/bin/rsvg-convert ] && [ ! -e /usr/local/bin/rsvg ]; then
+    ln -sf /usr/bin/rsvg-convert /usr/local/bin/rsvg
+fi
 echo "KizukaOS: gfxboot dummy + syslinux compat done"
