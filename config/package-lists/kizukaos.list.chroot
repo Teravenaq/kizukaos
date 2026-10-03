@@ -1,0 +1,35 @@
+# KizukaOS Desktop ringan — XFCE + tools dev
+xfce4
+xfce4-terminal
+xfce4-goodies
+thunar
+mousepad
+network-manager-gnome
+xserver-xorg
+xinit
+slim
+
+# Browser
+firefox
+
+# Tools dev
+git
+curl
+wget
+neovim
+build-essential
+python3
+python3-pip
+python3-venv
+nodejs
+npm
+
+# Utilitas
+htop
+neofetch
+tmux
+unzip
+zip
+file
+jq
+openssh-client
