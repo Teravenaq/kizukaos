@@ -16,7 +16,7 @@ EOF
 echo "alias fetch='neofetch'" >> /etc/skel/.bashrc
 echo "PS1='\u@kizukaos:\w\$ '" >> /etc/skel/.bashrc
 
-# Wallpaper KizukaOS + xfconf autostart config
+# Wallpaper KizukaOS untuk semua user baru
 mkdir -p /usr/share/backgrounds
 cat > /usr/share/backgrounds/kizukaos-wallpaper.xml <<'WALL'
 iVBORw0KGgoAAAANSUhEUgAAB4AAAAQ4CAIAAABnsVYUAAAABmJLR0QA/wD/AP+gvaeTAAAgAElE
@@ -758,7 +758,10 @@ for U in /etc/skel /root; do
     <property name="screen0" type="empty">
       <property name="monitor0" type="empty">
         <property name="workspace0" type="empty">
-          <property name="last-style" type="uint" value="0"/>
+          <property name="color-style" type="uint" value="0"/>
+          <property name="image-style" type="uint" value="5"/>
+          <property name="last-style" type="uint" value="5"/>
+          <property name="image-show" type="bool" value="true"/>
           <property name="image-path" type="string" value="/usr/share/backgrounds/kizukaos.png"/>
         </property>
       </property>
