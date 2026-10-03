@@ -38,6 +38,7 @@ casper
 grub-efi-amd64
 grub-pc-bin
 grub-common
+isolinux
 xorriso
 mtools
 syslinux
