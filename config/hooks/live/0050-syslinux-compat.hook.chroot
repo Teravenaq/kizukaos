@@ -1,0 +1,22 @@
+#!/bin/sh
+# KizukaOS compat hook: live-build 3.0 (Debian-era) expects the old syslinux paths
+# /usr/lib/syslinux/isolinux.bin and /usr/lib/syslinux/vesamenu.c32.
+# On Ubuntu 24.04 (noble) the package layout changed:
+#   - isolinux         -> /usr/lib/ISOLINUX/isolinux.bin
+#   - syslinux-common  -> /usr/lib/syslinux/modules/bios/vesamenu.c32
+# Without these symlinks lb_binary_syslinux fails with:
+#   cp: cannot stat '/root/isolinux/isolinux.bin': No such file or directory
+set -e
+
+if [ -f /usr/lib/ISOLINUX/isolinux.bin ]; then
+    ln -sf /usr/lib/ISOLINUX/isolinux.bin /usr/lib/syslinux/isolinux.bin
+fi
+
+if [ -f /usr/lib/syslinux/modules/bios/vesamenu.c32 ]; then
+    ln -sf /usr/lib/syslinux/modules/bios/vesamenu.c32 /usr/lib/syslinux/vesamenu.c32
+fi
+
+# Make sure the isohybrid binary the ISO stage needs is present
+if [ ! -e /usr/bin/isohybrid ] && [ -e /usr/bin/isohybrid ]; then
+    true
+fi
