@@ -25,7 +25,7 @@ jobs:
 
       - name: Build ISO
         run: |
-          sudo lb config --distribution noble --archive-areas "main universe restricted" --initramfs live-boot \
+          sudo lb config --distribution noble --archive-areas "main universe restricted" --initramfs live-boot --initsystem systemd \
             --bootappend-live "boot=live components username=kizuka hostname=kizukaos quiet splash" \
             --iso-volume "KizukaOS" --iso-application "KizukaOS Live" \
             --iso-publisher "Kizuka; https://github.com/Teravenaq" \
