@@ -1,22 +1,20 @@
 #!/bin/sh
-# KizukaOS compat hook: live-build 3.0 (Debian-era) expects the old syslinux paths
-# /usr/lib/syslinux/isolinux.bin and /usr/lib/syslinux/vesamenu.c32.
-# On Ubuntu 24.04 (noble) the package layout changed:
-#   - isolinux         -> /usr/lib/ISOLINUX/isolinux.bin
-#   - syslinux-common  -> /usr/lib/syslinux/modules/bios/vesamenu.c32
-# Without these symlinks lb_binary_syslinux fails with:
-#   cp: cannot stat '/root/isolinux/isolinux.bin': No such file or directory
+# Compat: old live-build (3.0) in ubuntu mode expects gfxboot-theme-ubuntu bootlogo at binary
+# stage (`tar xfz /usr/share/gfxboot-theme-ubuntu/bootlogo.tar.gz`) but that package is gone on
+# noble. Provide an empty tar so extraction succeeds. Also create old-layout syslinux symlinks.
 set -e
-
-if [ -f /usr/lib/ISOLINUX/isolinux.bin ]; then
+mkdir -p /usr/share/gfxboot-theme-ubuntu
+if [ ! -s /usr/share/gfxboot-theme-ubuntu/bootlogo.tar.gz ]; then
+    T=$(mktemp -d)
+    mkdir -p "$T/empty"
+    tar cfz /usr/share/gfxboot-theme-ubuntu/bootlogo.tar.gz -C "$T" empty
+    rm -rf "$T"
+fi
+mkdir -p /usr/lib/syslinux
+if [ -e /usr/lib/ISOLINUX/isolinux.bin ]; then
     ln -sf /usr/lib/ISOLINUX/isolinux.bin /usr/lib/syslinux/isolinux.bin
 fi
-
-if [ -f /usr/lib/syslinux/modules/bios/vesamenu.c32 ]; then
+if [ -e /usr/lib/syslinux/modules/bios/vesamenu.c32 ]; then
     ln -sf /usr/lib/syslinux/modules/bios/vesamenu.c32 /usr/lib/syslinux/vesamenu.c32
 fi
-
-# Make sure the isohybrid binary the ISO stage needs is present
-if [ ! -e /usr/bin/isohybrid ] && [ -e /usr/bin/isohybrid ]; then
-    true
-fi
+echo "KizukaOS: gfxboot dummy + syslinux compat done"
