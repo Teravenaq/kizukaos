@@ -41,3 +41,4 @@ grub-common
 xorriso
 mtools
 syslinux
+syslinux-utils
