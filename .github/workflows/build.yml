@@ -27,6 +27,7 @@ jobs:
             --iso-volume "KizukaOS" --iso-application "KizukaOS Live" \
             --iso-publisher "Kizuka; https://github.com/Teravenaq" \
             --linux-packages "linux-image" --apt-recommends false
+          set -o pipefail
           sudo lb build 2>&1 | tee build.log
 
       - name: Rename ISO
