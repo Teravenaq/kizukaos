@@ -774,39 +774,36 @@ done
 # Wallpaper: autostart script (set ke semua monitor, hindari masalah nama monitor)
 cat > /usr/local/bin/kizukaos-wallpaper <<'WPSH'
 #!/bin/sh
-# Set wallpaper KizukaOS di semua monitor/workspace sesi XFCE saat ini.
-command -v xfconf-query >/dev/null 2>&1 || exit 0
+# Pasang wallpaper KizukaOS di semua monitor/workspace sesi XFCE (robust utk nama monitor apa pun).
 WALL=/usr/share/backgrounds/kizukaos.png
 [ -f "$WALL" ] || exit 0
-for attempt in 1 2 3 4 5; do
-    PROPS=$(xfconf-query -c xfce4-desktop -l 2>/dev/null | grep -E 'image-path$')
-    if [ -n "$PROPS" ]; then
-        echo "$PROPS" | while read -r p; do
-            xfconf-query -c xfce4-desktop -p "$p" -s "$WALL" 2>/dev/null
-        done
-        for suf in image-show; do
-            xfconf-query -c xfce4-desktop -l 2>/dev/null | grep -E "${suf}$" | while read -r p; do
-                xfconf-query -c xfce4-desktop -p "$p" -s true 2>/dev/null
-            done
-        done
-        xfconf-query -c xfce4-desktop -l 2>/dev/null | grep -E 'image-style$' | while read -r p; do
-            xfconf-query -c xfce4-desktop -p "$p" -s 5 2>/dev/null
-        done
-        # fallback: kalau belum ada properti image-path sama sekali, set untuk monitor0
-        if [ -z "$(xfconf-query -c xfce4-desktop -l 2>/dev/null | grep -E 'image-path$')" ]; then
-            for m in monitor0 monitorQXL-1 monitorVirtual-1; do
-                for w in workspace0 workspace1; do
-                    xfconf-query -c xfce4-desktop -p "/backdrop/screen0/${m}/${w}/image-path" -s "$WALL" -n -t string 2>/dev/null
-                done
-            done
-        fi
-        sleep 1
-        exit 0
-    fi
-    sleep 2
-done
-exit 0
+command -v xfconf-query >/dev/null 2>&1 || exit 0
 
+set_wall() {
+    _MON="$1"
+    for _WS in workspace0 workspace1 workspace2 workspace3; do
+        _BASE="/backdrop/screen0/${_MON}/${_WS}"
+        xfconf-query -c xfce4-desktop -p "${_BASE}/image-path"  -s "$WALL" -n -t string 2>/dev/null
+        xfconf-query -c xfce4-desktop -p "${_BASE}/last-image"  -s "$WALL" -n -t string 2>/dev/null
+        xfconf-query -c xfce4-desktop -p "${_BASE}/image-show"  -s true  -n -t bool   2>/dev/null
+        xfconf-query -c xfce4-desktop -p "${_BASE}/image-style" -s 5     -n -t uint   2>/dev/null
+        xfconf-query -c xfce4-desktop -p "${_BASE}/color-style" -s 0     -n -t uint   2>/dev/null
+    done
+}
+
+for _TRY in 1 2 3 4 5 6 7 8 9 10; do
+    _MONITORS=""
+    if command -v xrandr >/dev/null 2>&1; then
+        _MONITORS=$(xrandr --listmonitors 2>/dev/null | awk 'NR>1 {print $4}')
+    fi
+    [ -z "$_MONITORS" ] && _MONITORS=$(xfconf-query -c xfce4-desktop -l 2>/dev/null \
+        | sed -n 's|^/backdrop/screen[0-9]*/\(monitor[^/]*\)/.*|\1|p' | sort -u)
+    [ -z "$_MONITORS" ] && _MONITORS="monitor0"
+    for _M in $_MONITORS; do set_wall "$_M"; done
+    sleep 1
+done
+command -v xfdesktop >/dev/null 2>&1 && xfdesktop --reload 2>/dev/null
+exit 0
 WPSH
 chmod +x /usr/local/bin/kizukaos-wallpaper
 mkdir -p /etc/xdg/autostart
