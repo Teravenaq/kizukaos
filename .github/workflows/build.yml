@@ -31,9 +31,9 @@ jobs:
 
       - name: Rename ISO
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
-          mv live-image-amd64.hybrid.iso "kizukaos-${VERSION}-amd64.iso" 2>/dev/null || \
-          mv *.iso "kizukaos-${VERSION}-amd64.iso"
+          ISO=$(ls *.iso 2>/dev/null | head -1)
+          [ -z "$ISO" ] && ISO=live-image-amd64.hybrid.iso
+          cp "$ISO" "kizukaos-${GITHUB_RUN_NUMBER}-amd64.iso"
           ls -lh *.iso
 
       - name: Upload artifact (setiap build)
