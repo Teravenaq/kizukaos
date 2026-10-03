@@ -40,3 +40,4 @@ grub-pc-bin
 grub-common
 xorriso
 mtools
+syslinux
