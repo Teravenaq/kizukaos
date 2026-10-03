@@ -35,3 +35,8 @@ jq
 openssh-client
 initramfs-tools
 casper
+grub-efi-amd64
+grub-pc-bin
+grub-common
+xorriso
+mtools
