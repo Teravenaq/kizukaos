@@ -40,6 +40,7 @@ grub-efi-amd64
 grub-pc-bin
 grub-common
 isolinux
+librsvg2-bin
 xorriso
 mtools
 syslinux
