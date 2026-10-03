@@ -36,6 +36,8 @@ openssh-client
 initramfs-tools
 live-boot
 live-config
+user-setup
+live-tools
 grub-efi-amd64
 grub-pc-bin
 grub-common
