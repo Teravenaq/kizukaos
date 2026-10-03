@@ -29,7 +29,7 @@ jobs:
             --bootappend-live "boot=live components username=kizuka hostname=kizukaos quiet splash" \
             --iso-volume "KizukaOS" --iso-application "KizukaOS Live" \
             --iso-publisher "Kizuka; https://github.com/Teravenaq" \
-            --linux-packages "linux-image" --bootloader grub-efi --binary-images iso --apt-recommends false
+            --linux-packages "linux-image" --bootloader syslinux --binary-images iso-hybrid --apt-recommends false
           set -o pipefail
           sudo lb build 2>&1 | tee build.log
 
