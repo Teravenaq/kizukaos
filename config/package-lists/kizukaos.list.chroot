@@ -33,3 +33,5 @@ zip
 file
 jq
 openssh-client
+initramfs-tools
+casper
