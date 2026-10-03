@@ -34,7 +34,8 @@ file
 jq
 openssh-client
 initramfs-tools
-casper
+live-boot
+live-config
 grub-efi-amd64
 grub-pc-bin
 grub-common
