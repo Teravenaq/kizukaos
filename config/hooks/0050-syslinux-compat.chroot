@@ -1,7 +1,8 @@
 #!/bin/sh
-# Compat: old live-build (3.0) in ubuntu mode expects gfxboot-theme-ubuntu bootlogo at binary
-# stage (`tar xfz /usr/share/gfxboot-theme-ubuntu/bootlogo.tar.gz`) but that package is gone on
-# noble. Provide an empty tar so extraction succeeds. Also create old-layout syslinux symlinks.
+# Compat shims for live-build 3.0 (Debian-era) on Ubuntu 24.04 noble:
+# 1. gfxboot-theme-ubuntu bootlogo gone -> dummy empty tar so `tar xfz` succeeds.
+# 2. old syslinux paths: isolinux.bin + vesamenu.c32 symlinks.
+# 3. `rsvg` command gone -> wrapper translating old CLI (in out) to rsvg-convert (-o).
 set -e
 mkdir -p /usr/share/gfxboot-theme-ubuntu
 if [ ! -s /usr/share/gfxboot-theme-ubuntu/bootlogo.tar.gz ]; then
@@ -17,8 +18,20 @@ fi
 if [ -e /usr/lib/syslinux/modules/bios/vesamenu.c32 ]; then
     ln -sf /usr/lib/syslinux/modules/bios/vesamenu.c32 /usr/lib/syslinux/vesamenu.c32
 fi
-# Old live-build calls `rsvg` (removed upstream); librsvg2-bin ships `rsvg-convert`.
-if [ -e /usr/bin/rsvg-convert ] && [ ! -e /usr/local/bin/rsvg ]; then
-    ln -sf /usr/bin/rsvg-convert /usr/local/bin/rsvg
+if [ -e /usr/bin/rsvg-convert ]; then
+    cat > /usr/local/bin/rsvg <<'RSVG'
+#!/bin/sh
+# translate `rsvg --format png --height H --width W in.svg out.png` to rsvg-convert
+in=""
+out=""
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --format|--height|--width) fmt="$1"; shift; val="$1"; shift; ;;
+        *) if [ -z "$in" ]; then in="$1"; else out="$1"; fi; shift; ;;
+    esac
+done
+exec /usr/bin/rsvg-convert -f png -w 640 -h 480 "$in" -o "$out"
+RSVG
+    chmod +x /usr/local/bin/rsvg
 fi
-echo "KizukaOS: gfxboot dummy + syslinux compat done"
+echo "KizukaOS: gfxboot dummy + syslinux compat + rsvg wrapper done"
