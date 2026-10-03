@@ -1,0 +1,7 @@
+#!/bin/sh
+# Install linux-modules-extra supaya driver DRM (bochs-drm, qxl, vmwgfx) ikut — tanpa ini X gagal (no /dev/dri)
+set -e
+KVER=$(ls /boot | grep -oP '^vmlinuz-\K[0-9][^-]*-generic' | sort -V | tail -1)
+if [ -n "$KVER" ]; then
+    apt-get install -y -qq "linux-modules-extra-${KVER}" || echo "WARN: modules-extra gagal untuk ${KVER}"
+fi
