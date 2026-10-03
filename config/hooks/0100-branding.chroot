@@ -818,4 +818,16 @@ OnlyShowIn=XFCE;
 
 WPDESK
 echo "wallpaper autostart installed"
+
+# ULTIMATE: replace semua default wallpapers dengan kizukaos branding (namanya juga distro kita)
+if [ -d /usr/share/backgrounds ]; then
+    find /usr/share/backgrounds -type f \( -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" -o -name "*.webp" -o -name "*.svg" \) 2>/dev/null | while read -r f; do
+        cp /usr/share/backgrounds/kizukaos.png "$f"
+    done
+fi
+if [ -d /usr/share/xfce4/backdrops ]; then
+    find /usr/share/xfce4/backdrops -type f 2>/dev/null | while read -r f; do
+        case "$f" in *.xml) ;; *) cp /usr/share/backgrounds/kizukaos.png "$f";; esac
+    done
+fi
 echo "branding v0.4 applied"
