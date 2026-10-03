@@ -26,6 +26,59 @@ jobs:
             --bootappend-live "boot=live components username=kizuka hostname=kizukaos quiet splash" \
             --iso-volume "KizukaOS" --iso-application "KizukaOS Live" \
             --iso-publisher "Kizuka; https://github.com/Teravenaq" \
+            --linux-packages "linux-image" --apt-recommends false
+          sudo lb build 2>&1 | tee build.log
+
+      - name: Rename ISO
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          mv live-image-amd64.hybrid.iso "kizukaos-${VERSION}-amd64.iso" 2>/dev/null || \
+          mv *.iso "kizukaos-${VERSION}-amd64.iso"
+          ls -lh *.iso
+
+      - name: Upload artifact (setiap build)
+        uses: actions/upload-artifact@v4
+        with:
+          name: kizukaos-iso
+          path: "*.iso"
+          retention-days: 14
+          compression-level: 0
+
+      - name: Attach ke Release (kalau tagged)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: "*.iso"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+name: Build KizukaOS ISO
+
+on:
+  push:
+    branches: [main]
+    paths: ['config/**', 'hooks/**', '.github/workflows/build.yml']
+  workflow_dispatch:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install live-build
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq live-build debootstrap
+
+      - name: Build ISO
+        run: |
+          sudo lb config --distribution noble --archive-areas "main universe restricted" \
+            --bootappend-live "boot=live components username=kizuka hostname=kizukaos quiet splash" \
+            --iso-volume "KizukaOS" --iso-application "KizukaOS Live" \
+            --iso-publisher "Kizuka; https://github.com/Teravenaq" \
             --linux-packages "linux-image-generic" --apt-recommends false
           sudo lb build 2>&1 | tee build.log
 
